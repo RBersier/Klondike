@@ -12,9 +12,11 @@ Description:    this file contains the code for
 
 #Import
 import tkinter as tk
-from PIL import Image, ImageTk
+from cProfile import label
 
-#fonctions
+from images import cards
+
+#homepage fonction
 def home_window():
     #Create the window
     home_page = tk.Tk()
@@ -26,5 +28,22 @@ def home_window():
     #background color
     home_page.configure(background="green")
 
-    #upload the cards' images
+    #upload the Ace cards' images
+    heart_ace = ImageTk.PhotoImage(cards.open("ace_of_hearts.png"))
+    club_ace = ImageTk.PhotoImage(cards.open("ace_of_clubs.png"))
+    diamond_ace = ImageTk.PhotoImage(cards.open("ace_of_diamonds.png"))
+    spade_ace = ImageTk.PhotoImage(cards.open("ace_of_spades.png"))
 
+    #Labels creation
+    label_heart_ace = tk.Label(home_page, image=heart_ace)
+    label_club_ace = tk.Label(home_page, image=club_ace)
+    label_diamond_ace = tk.Label(home_page, image=diamond_ace)
+    label_spade_ace = tk.Label(home_page, image=spade_ace)
+
+    #label placement
+    label_heart_ace.place(relx=0.5, rely=0.15, anchor=tk.CENTER)
+    label_club_ace.place(relx=0.5, rely=0.25, anchor=tk.CENTER)
+    label_diamond_ace.place(relx=0.5, rely=0.35, anchor=tk.CENTER)
+    label_spade_ace.place(relx=0.5, rely=0.45, anchor=tk.CENTER)
+
+    #Buttons
