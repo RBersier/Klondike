@@ -25,3 +25,6 @@ def home_window():
 
     #background color
     home_page.configure(background="green")
+
+    #upload the cards' images
+
