@@ -10,3 +10,8 @@ Description:    this file contains the code for
                 the first window to appear while launching the game.
 """
 
+#Import
+import tkinter as tk
+from PIL import Image, ImageTk
+
+#fonctions
