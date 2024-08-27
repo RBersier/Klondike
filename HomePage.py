@@ -15,3 +15,13 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 #fonctions
+def home_window():
+    #Create the window
+    home_page = tk.Tk()
+    home_page.title("Klondike")
+    height = 500
+    width = 500
+    home_page.geometry(f"{width}x{height}")
+
+    #background color
+    home_page.configure(background="green")
