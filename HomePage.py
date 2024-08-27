@@ -12,7 +12,7 @@ Description:    this file contains the code for
 
 #Import
 import tkinter as tk
-from images import cards
+from PIL import ImageTK, Image
 
 
 #homepage fonction
@@ -27,6 +27,8 @@ def home_window():
     #background color
     home_page.configure(background="green")
 
+    #get the location of the pictures
+    image_location = ""
     #upload the Ace cards' images
     heart_ace = ImageTk.PhotoImage(cards.open("ace_of_hearts.png"))
     club_ace = ImageTk.PhotoImage(cards.open("ace_of_clubs.png"))
