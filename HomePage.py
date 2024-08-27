@@ -12,9 +12,8 @@ Description:    this file contains the code for
 
 #Import
 import tkinter as tk
-from cProfile import label
-
 from images import cards
+
 
 #homepage fonction
 def home_window():
@@ -47,3 +46,13 @@ def home_window():
     label_spade_ace.place(relx=0.5, rely=0.45, anchor=tk.CENTER)
 
     #Buttons
+    start_button = tk.Button(home_page, text="Start", font=("Arial", 16))
+    start_button.place(relx=0.5, rely=0.75, anchor=tk.CENTER)
+
+    button_score = tk.Button(home_page, text="Score", font=("Arial", 16))
+    button_score.place(relx=0.5, rely=0.95, anchor=tk.CENTER)
+
+    #launch window
+    home_page.mainloop()
+
+home_window()
