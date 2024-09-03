@@ -3,7 +3,7 @@ Project : Klondike
 Module : Projet Dev
 Author : Ryan BERSIER & Alexis LEAKOS
 Start date: 20.08.24
-Latest update: 20.08.24
+Latest update: 03.08.24
 Version : 0.1
 
 Description:    this file contains the code for
@@ -12,8 +12,7 @@ Description:    this file contains the code for
 
 #Import
 import tkinter as tk
-from PIL import ImageTK, Image
-
+from PIL import Image, ImageTk
 
 #homepage fonction
 def home_window():
@@ -28,12 +27,12 @@ def home_window():
     home_page.configure(background="green")
 
     #get the location of the pictures
-    image_location = ""
+    image_location = "images/cards/"
     #upload the Ace cards' images
-    heart_ace = ImageTk.PhotoImage(cards.open("ace_of_hearts.png"))
-    club_ace = ImageTk.PhotoImage(cards.open("ace_of_clubs.png"))
-    diamond_ace = ImageTk.PhotoImage(cards.open("ace_of_diamonds.png"))
-    spade_ace = ImageTk.PhotoImage(cards.open("ace_of_spades.png"))
+    heart_ace = ImageTk.PhotoImage(Image.open(image_location + "ace_of_hearts.png"))
+    club_ace = ImageTk.PhotoImage(Image.open(image_location + "ace_of_clubs.png"))
+    diamond_ace = ImageTk.PhotoImage(Image.open(image_location + "ace_of_diamonds.png"))
+    spade_ace = ImageTk.PhotoImage(Image.open(image_location + "ace_of_spades.png"))
 
     #Labels creation
     label_heart_ace = tk.Label(home_page, image=heart_ace)
