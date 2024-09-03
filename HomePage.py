@@ -49,17 +49,17 @@ def home_window():
     label_spade_ace = tk.Label(home_page, image=spade_ace)
 
     #label placement
-    label_heart_ace.place(relx=0.5, rely=0.15, anchor=tk.CENTER)
-    label_club_ace.place(relx=0.5, rely=0.25, anchor=tk.CENTER)
-    label_diamond_ace.place(relx=0.5, rely=0.35, anchor=tk.CENTER)
-    label_spade_ace.place(relx=0.5, rely=0.45, anchor=tk.CENTER)
+    label_heart_ace.place(relx=0.35, rely=0.25, anchor=tk.CENTER)
+    label_club_ace.place(relx=0.45, rely=0.25, anchor=tk.CENTER)
+    label_diamond_ace.place(relx=0.55, rely=0.25, anchor=tk.CENTER)
+    label_spade_ace.place(relx=0.65, rely=0.25, anchor=tk.CENTER)
 
     #Buttons
     start_button = tk.Button(home_page, text="Start", font=("Arial", 16), command=start)
-    start_button.place(relx=0.5, rely=0.75, anchor=tk.CENTER)
+    start_button.place(relx=0.5, rely=0.60, anchor=tk.CENTER)
 
     button_score = tk.Button(home_page, text="Score", font=("Arial", 16))
-    button_score.place(relx=0.5, rely=0.95, anchor=tk.CENTER)
+    button_score.place(relx=0.5, rely=0.70, anchor=tk.CENTER)
 
     #launch window
     home_page.mainloop()
