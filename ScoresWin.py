@@ -21,3 +21,5 @@ def score_window():
     height = 800
     width = 800
     score_page.geometry(f"{width}x{height}")
+    #launch window
+    score_window.mainloop()

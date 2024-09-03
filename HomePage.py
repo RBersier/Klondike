@@ -30,6 +30,7 @@ def start():
 def see_scores():
     global ScoresWin
     home_page.destroy()
+    ScoresWin.score_window()
 
 
 
