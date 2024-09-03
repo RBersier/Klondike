@@ -19,12 +19,12 @@ SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Klondike"
 
 # Couleur vert foncé (en RGB)
-DARK_GREEN = (0, 100, 0)
+DARK_GREEN = (0, 100, 0, 1)
 
 
 def on_draw(delta_time):
     """ Fonction de dessin, appelée à chaque image """
-    arcade.start_render()
+    arcade.clear()
     # Ici, nous ne faisons que remplir l'écran avec la couleur de fond
     # Cette fonction sera appelée automatiquement par arcade.run()
 

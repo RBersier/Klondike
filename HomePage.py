@@ -14,6 +14,9 @@ Description:    this file contains the code for
 import tkinter as tk
 from PIL import Image, ImageTk
 
+#variables
+
+
 #homepage fonction
 def home_window():
     #Create the window
