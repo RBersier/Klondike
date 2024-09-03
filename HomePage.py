@@ -11,14 +11,19 @@ Description:    this file contains the code for
 """
 
 #Import
+import Game
 import tkinter as tk
 from PIL import Image, ImageTk
 
 #variables
-
+def start():
+    global home_page
+    home_page.destroy()
+    Game.start_game()
 
 #homepage fonction
 def home_window():
+    global home_page
     #Create the window
     home_page = tk.Tk()
     home_page.title("Klondike")
@@ -50,7 +55,7 @@ def home_window():
     label_spade_ace.place(relx=0.5, rely=0.45, anchor=tk.CENTER)
 
     #Buttons
-    start_button = tk.Button(home_page, text="Start", font=("Arial", 16))
+    start_button = tk.Button(home_page, text="Start", font=("Arial", 16), command=start)
     start_button.place(relx=0.5, rely=0.75, anchor=tk.CENTER)
 
     button_score = tk.Button(home_page, text="Score", font=("Arial", 16))
