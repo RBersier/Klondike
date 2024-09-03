@@ -11,36 +11,30 @@ Description:    this file contains the code for
 """
 
 # imports
-import arcade
+import pygame
+import sys
 
-# Définir les dimensions de la fenêtre et nom
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
-SCREEN_TITLE = "Klondike"
+# Initialiser Pygame
+pygame.init()
 
-# Couleur vert foncé (en RGB)
-DARK_GREEN = (0, 100, 0, 1)
+# Définir la taille de la fenêtre
+screen_width = 1280
+screen_height = 720
+screen = pygame.display.set_mode((screen_width, screen_height))
 
+# Définir la couleur vert foncé (R, G, B)
+dark_green = (0, 100, 0)
 
-def on_draw(delta_time):
-    """ Fonction de dessin, appelée à chaque image """
-    arcade.clear()
-    # Ici, nous ne faisons que remplir l'écran avec la couleur de fond
-    # Cette fonction sera appelée automatiquement par arcade.run()
+# Remplir l'écran avec la couleur vert foncé
+screen.fill(dark_green)
 
+# Mettre à jour l'affichage
+pygame.display.flip()
 
-def main():
-    # Ouvrir la fenêtre
-    arcade.open_window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-
-    # Définir la couleur de fond à vert foncé
-    arcade.set_background_color(DARK_GREEN)
-
-    # Spécifier la fonction de dessin avec le temps entre les appels
-    arcade.schedule(on_draw, 1 / 60)  # Appelle on_draw à 60 FPS
-
-    # Démarrer la boucle de rendu
-    arcade.run()
-
-main()
-
+# Boucle principale
+def start_game():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
