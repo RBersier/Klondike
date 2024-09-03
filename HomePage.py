@@ -10,16 +10,28 @@ Description:    this file contains the code for
                 the first window to appear while launching the game.
 """
 
-#Import
+# Imports
 import Game
+import ScoresWin
 import tkinter as tk
 from PIL import Image, ImageTk
 
-#variables
+# variables
+
+# fonctions
+# fonction to launch the game
 def start():
     global home_page
     home_page.destroy()
     Game.start_game()
+
+
+# fonction to go to the highscores page
+def see_scores():
+    global ScoresWin
+    home_page.destroy()
+
+
 
 #homepage fonction
 def home_window():

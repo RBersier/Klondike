@@ -12,3 +12,12 @@ Description:    this file contains the code for
 
 # Imports
 import tkinter as tk
+
+def score_window():
+    global home_page
+    #Create the window
+    score_page = tk.Tk()
+    score_page.title("Klondike")
+    height = 800
+    width = 800
+    score_page.geometry(f"{width}x{height}")
