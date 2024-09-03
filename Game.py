@@ -119,4 +119,3 @@ def start_game():
 
         # Mettre à jour l'affichage
         pygame.display.flip()
-
