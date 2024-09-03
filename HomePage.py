@@ -28,7 +28,7 @@ def start():
 
 # fonction to go to the highscores page
 def see_scores():
-    global ScoresWin
+    global score_window
     home_page.destroy()
     ScoresWin.score_window()
 
