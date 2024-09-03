@@ -13,46 +13,55 @@ Description:    this file contains the code for
 # imports
 import pygame
 import sys
+import os
 
-# Boucle principale
+
+def load_images(folder_path):
+    """ Charge toutes les images de cartes à partir du dossier spécifié. """
+    images = {}
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".png"):
+            card_name = filename.split(".")[0]
+            images[card_name] = pygame.image.load(os.path.join(folder_path, filename))
+    return images
+
+
+def initialize_rectangles(images, start_x=100, start_y=100, spacing_x=50):
+    """ Initialise les rectangles des cartes avec des positions espacées horizontalement. """
+    rectangles = {}
+    x, y = start_x, start_y
+    for card_name in images.keys():
+        rect = images[card_name].get_rect(topleft=(x, y))
+        rectangles[card_name] = rect
+        # Espacement horizontal pour la prochaine carte
+        x += spacing_x
+        # Si les cartes dépassent la largeur de l'écran, passe à la ligne suivante
+        if x > 1280 - spacing_x:
+            x = start_x
+            y += 50  # Espacement vertical
+    return rectangles
+
+
 def start_game():
-    # Initialiser Pygame
     pygame.init()
 
-    # Définir la taille de la fenêtre
     screen_width = 1280
     screen_height = 720
     screen = pygame.display.set_mode((screen_width, screen_height))
 
-    # Définir la couleur vert foncé (R, G, B)
     dark_green = (0, 100, 0)
 
-    # Charger l'image
-    a_clubs = pygame.image.load("images/cards/ace_of_clubs.png")
-    a_hearts = pygame.image.load("images/cards/ace_of_hearts.png")
-    a_spades = pygame.image.load("images/cards/ace_of_spades.png")
-    a_diamonds = pygame.image.load("images/cards/ace_of_diamonds.png")
+    # Charger toutes les images de cartes
+    card_images = load_images("images/cards")
 
-    # Obtenir un rectangle à partir de l'image pour gérer les positions
-    a_clubs_rect = a_clubs.get_rect()
-    a_clubs_rect.topleft = (100, 100)  # Position initiale de l'image
+    # Initialiser les rectangles pour chaque carte
+    card_rectangles = initialize_rectangles(card_images)
 
-    a_hearts_rect = a_hearts.get_rect()
-    a_hearts_rect.topleft = (200, 100)  # Position initiale de l'image
-
-    a_spades_rect = a_spades.get_rect()
-    a_spades_rect.topleft = (300, 100)  # Position initiale de l'image
-
-    a_diamonds_rect = a_diamonds.get_rect()
-    a_diamonds_rect.topleft = (400, 100)  # Position initiale de l'image
-
-    moving_a_clubs = False
-    moving_a_hearts = False
-    moving_a_spades = False
-    moving_a_diamonds = False
-
-    # Remplir l'écran avec la couleur vert foncé
-    screen.fill(dark_green)
+    # Variables pour suivre l'état de déplacement
+    dragging = False
+    dragged_card = None
+    offset_x = 0
+    offset_y = 0
 
     while True:
         for event in pygame.event.get():
@@ -61,61 +70,29 @@ def start_game():
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-            # Vérifier si la souris clique sur l'image
-                if a_clubs_rect.collidepoint(event.pos):
-                    moving_a_clubs = True
-                    mouse_x, mouse_y = event.pos
-                    offset_x = a_clubs_rect.x - mouse_x
-                    offset_y = a_clubs_rect.y - mouse_y
-                elif a_hearts_rect.collidepoint(event.pos):
-                    moving_a_hearts = True
-                    mouse_x, mouse_y = event.pos
-                    offset_x = a_hearts_rect.x - mouse_x
-                    offset_y = a_hearts_rect.y - mouse_y
-                elif a_spades_rect.collidepoint(event.pos):
-                    moving_a_spades = True
-                    mouse_x, mouse_y = event.pos
-                    offset_x = a_spades_rect.x - mouse_x
-                    offset_y = a_spades_rect.y - mouse_y
-                elif a_diamonds_rect.collidepoint(event.pos):
-                    moving_a_diamonds = True
-                    mouse_x, mouse_y = event.pos
-                    offset_x = a_diamonds_rect.x - mouse_x
-                    offset_y = a_diamonds_rect.y - mouse_y
+                # Vérifier si la souris clique sur une carte
+                for card_name, rect in card_rectangles.items():
+                    if rect.collidepoint(event.pos):
+                        dragging = True
+                        dragged_card = card_name
+                        offset_x = rect.x - event.pos[0]
+                        offset_y = rect.y - event.pos[1]
+                        break
 
             elif event.type == pygame.MOUSEBUTTONUP:
-                moving_a_clubs = False
-                moving_a_hearts = False
-                moving_a_spades = False
-                moving_a_diamonds = False
+                dragging = False
+                dragged_card = None
 
             elif event.type == pygame.MOUSEMOTION:
-                if moving_a_clubs:
-                    mouse_x, mouse_y = event.pos
-                    a_clubs_rect.x = mouse_x + offset_x
-                    a_clubs_rect.y = mouse_y + offset_y
-                elif moving_a_hearts:
-                    mouse_x, mouse_y = event.pos
-                    a_hearts_rect.x = mouse_x + offset_x
-                    a_hearts_rect.y = mouse_y + offset_y
-                elif moving_a_spades:
-                    mouse_x, mouse_y = event.pos
-                    a_spades_rect.x = mouse_x + offset_x
-                    a_spades_rect.y = mouse_y + offset_y
-                elif moving_a_diamonds:
-                    mouse_x, mouse_y = event.pos
-                    a_diamonds_rect.x = mouse_x + offset_x
-                    a_diamonds_rect.y = mouse_y + offset_y
+                if dragging and dragged_card:
+                    # Déplacer la carte avec la souris
+                    card_rectangles[dragged_card].x = event.pos[0] + offset_x
+                    card_rectangles[dragged_card].y = event.pos[1] + offset_y
 
-
-        # Remplir l'écran avec la couleur vert foncé
         screen.fill(dark_green)
 
-        # Dessiner l'image
-        screen.blit(a_clubs, a_clubs_rect)
-        screen.blit(a_hearts, a_hearts_rect)
-        screen.blit(a_spades, a_spades_rect)
-        screen.blit(a_diamonds, a_diamonds_rect)
+        # Dessiner toutes les cartes à leurs positions
+        for card_name, rect in card_rectangles.items():
+            screen.blit(card_images[card_name], rect)
 
-        # Mettre à jour l'affichage
         pygame.display.flip()
