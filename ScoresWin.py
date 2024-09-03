@@ -12,6 +12,7 @@ Description:    this file contains the code for
 
 # Imports
 import tkinter as tk
+import HomePage
 
 def score_window():
     global home_page
