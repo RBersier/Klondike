@@ -28,8 +28,8 @@ def start():
 
 # fonction to go to the highscores page
 def see_scores():
-    global score_window
-    score_window.destroy()
+    global home_page
+    home_page.destroy()
     ScoresWin.score_window()
 
 
@@ -71,7 +71,7 @@ def home_window():
     start_button = tk.Button(home_page, text="Start", font=("Arial", 16), command=start)
     start_button.place(relx=0.5, rely=0.60, anchor=tk.CENTER)
 
-    button_score = tk.Button(home_page, text="Score", font=("Arial", 16))
+    button_score = tk.Button(home_page, text="Score", font=("Arial", 16), command=see_scores)
     button_score.place(relx=0.5, rely=0.70, anchor=tk.CENTER)
 
     #launch window

@@ -21,5 +21,7 @@ def score_window():
     height = 800
     width = 800
     score_page.geometry(f"{width}x{height}")
+    # background color
+    score_page.configure(background="green")
     #launch window
-    score_window.mainloop()
+    score_page.mainloop()
