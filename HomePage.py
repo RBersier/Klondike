@@ -13,6 +13,7 @@ Description:    this file contains the code for
 # Imports
 import Game
 import ScoresWin
+from tkinter import messagebox
 import tkinter as tk
 from PIL import Image, ImageTk
 
@@ -23,7 +24,13 @@ from PIL import Image, ImageTk
 def start():
     global home_page
     home_page.destroy()
-    Game.start_game()
+    tutoask = messagebox.askyesno("Tutorial", "do you need a tutorial to learn how to play")
+    if tutoask:
+        tutorial = messagebox.showinfo("Tutorial", """Klondike Rules\n\n\nObjective: \nThe goal of Klondike is to move all the cards to the four foundation piles, one for each suit (Hearts, Diamonds, Clubs, Spades), starting with the Ace and ending with the King.\n\nSetup:\n1. Shuffle a standard 52-card deck.\n2. Deal seven piles of cards. The first pile has one card, the second has two, the third has three, and so on, up to the seventh pile which has seven cards. Only the top card of each pile is face up, the rest are face down.\n3. Place the remaining cards face down in a deck (also called the stock) in the upper left corner of the playing area.\n\nFoundations: \nThere are four foundation piles, one for each suit. Cards must be placed in ascending order (Ace to King) and sorted by suit.\n\nTableau:\n1. The tableau consists of the seven piles of cards dealt at the start of the game.\n2. Cards in the tableau are arranged in descending order (King to Ace) and alternating colors (red on black or black on red).\n\nStock and Waste Pile:\n1. The stock is the pile of leftover cards not dealt to the tableau.\n2. Draw one or three cards at a time (depending on your chosen rules) from the stock and place them face up in a waste pile.\n3. Only the top card of the waste pile can be played to the tableau or the foundations.\n\nRules for Moving Cards:\n1. Within the Tableau:\nMove cards between piles on the tableau in descending order and alternating colors. For example, a red 7 can only be placed on a black 8.\nYou can move a group of cards as long as they follow the descending sequence and alternate colors.\nIf a tableau pile is empty, only a King (or a sequence starting with a King) can be placed in the empty space.\n2. To the Foundations:\nYou can move cards from the tableau or the waste pile to the foundations if they are in the correct order and suit. For example, if a foundation pile has an Ace of Hearts, you can place the 2 of Hearts on top of it, followed by the 3 of Hearts, and so on.\n3. From the Stock:\nDraw cards from the stock and place them in the waste pile. You can play the top card of the waste pile to the tableau or foundations.\n\nWinning: \nYou win the game when all cards are moved to the four foundation piles in the correct order and suit, from Ace to King.\n\nAdditional Rules: \nIf you have exhausted all possible moves and the stock is empty, the game is over.\nSome variations allow you to go through the stock multiple times, while others limit it to once or three times.""")
+        if tutorial == "ok":
+            Game.start_game()
+    else:
+        Game.start_game()
 
 
 # fonction to go to the highscores page
