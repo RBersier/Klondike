@@ -1,4 +1,4 @@
-"""
+""""
 Project : Klondike
 Module : Projet Dev
 Author : Ryan BERSIER & Alexis LEAKOS
@@ -14,9 +14,6 @@ Description:    this file contains the code for
 import pygame
 import sys
 import os
-
-from pymunk.examples.constraints import screen
-
 
 def load_images(folder_path):
     # Charge all the cards' pictures from a specified folder.
@@ -47,24 +44,23 @@ def initialize_rectangles(images, start_x=100, start_y=100, spacing_x=50):
 def place_object(row, col, obj):
     grid[row][col] = obj
 
-
-
-
 def draw_grid():
+    rows, cols = 13, 6
+    cell_size = 12
     for row in range(rows):
         for col in range(cols):
             # Dessiner le rectangle de la cellule
-            pygame.draw.rect(screen, (255, 255, 255), (col * cell_size, row * cell_size, cell_size, cell_size), 1)
-
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(col * cell_size, row * cell_size, cell_size, cell_size), 1)
+            #print(row, col)
             # Si une cellule contient un objet, le dessiner
-            if grid[row][col]:
+            #if grid[row][col]:
                 # Code pour dessiner l'objet ici (exemple : un cercle)
-                pygame.draw.circle(screen, (0, 0, 255), (col * cell_size + cell_size // 2, row * cell_size + cell_size // 2), 10)
-
+                # circle = pygame.draw.circle(screen, (0, 0, 255), pygame.Rect(col * cell_size + cell_size // 2, row * cell_size + cell_size // 2), 10)
+                #print(row, col, "drawn")
 
 
 def start_game():
-    global grid
+    global grid, screen
     pygame.init()
 
     #whindow's top part
@@ -88,12 +84,13 @@ def start_game():
     offset_x = 0
     offset_y = 0
     rows, cols = 13, 6
-    grid = [[None for i in cols] for i in rows]
-
-    place_object(2, 3, "mon_objet")
+    grid = []
+    for i in range(rows):
+        grid.append([])
+        for x in range(cols):
+            grid[i].append([])
 
     while True:
-        draw_grid()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -120,9 +117,13 @@ def start_game():
                     card_rectangles[dragged_card].y = event.pos[1] + offset_y
 
         screen.fill(dark_green)
+        draw_grid()
 
         # Draw all cards on their position.
         for card_name, rect in card_rectangles.items():
             screen.blit(card_images[card_name], rect)
 
         pygame.display.flip()
+
+# if __name__ == "__main__":
+#    start_game()
