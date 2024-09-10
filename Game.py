@@ -10,14 +10,14 @@ Description:    this file contains the code for
                 running the game correctly.
 """
 
-# imports
+# Imports
 import pygame
 import sys
 import os
 
 
 def load_images(folder_path):
-    """ Charge toutes les images de cartes à partir du dossier spécifié. """
+    # Charge all the cards' pictures from a specified folder.
     images = {}
     for filename in os.listdir(folder_path):
         if filename.endswith(".png"):
@@ -27,18 +27,18 @@ def load_images(folder_path):
 
 
 def initialize_rectangles(images, start_x=100, start_y=100, spacing_x=50):
-    """ Initialise les rectangles des cartes avec des positions espacées horizontalement. """
+    # Initialise the rectangles of the cards with positions horizontally spaced.
     rectangles = {}
     x, y = start_x, start_y
     for card_name in images.keys():
         rect = images[card_name].get_rect(topleft=(x, y))
         rectangles[card_name] = rect
-        # Espacement horizontal pour la prochaine carte
+        # Horizontal space with the next card.
         x += spacing_x
-        # Si les cartes dépassent la largeur de l'écran, passe à la ligne suivante
+        # If the cards appear out of the window, make then appear one line bellow.
         if x > 1280 - spacing_x:
             x = start_x
-            y += 50  # Espacement vertical
+            y += 50  # Vertical space.
     return rectangles
 
 
@@ -51,13 +51,13 @@ def start_game():
 
     dark_green = (0, 100, 0)
 
-    # Charger toutes les images de cartes
+    # Charge all cards picture.
     card_images = load_images("images/cards")
 
-    # Initialiser les rectangles pour chaque carte
+    # Initialize the rectangles for each card
     card_rectangles = initialize_rectangles(card_images)
 
-    # Variables pour suivre l'état de déplacement
+    # Variables to follow the state of the movement.
     dragging = False
     dragged_card = None
     offset_x = 0
@@ -70,7 +70,7 @@ def start_game():
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                # Vérifier si la souris clique sur une carte
+                # Check if the pointer clic on a card.
                 for card_name, rect in card_rectangles.items():
                     if rect.collidepoint(event.pos):
                         dragging = True
@@ -85,13 +85,13 @@ def start_game():
 
             elif event.type == pygame.MOUSEMOTION:
                 if dragging and dragged_card:
-                    # Déplacer la carte avec la souris
+                    # move the card with the pointer.
                     card_rectangles[dragged_card].x = event.pos[0] + offset_x
                     card_rectangles[dragged_card].y = event.pos[1] + offset_y
 
         screen.fill(dark_green)
 
-        # Dessiner toutes les cartes à leurs positions
+        # Draw all cards on their position.
         for card_name, rect in card_rectangles.items():
             screen.blit(card_images[card_name], rect)
 

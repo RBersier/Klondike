@@ -17,10 +17,10 @@ from tkinter import messagebox
 import tkinter as tk
 from PIL import Image, ImageTk
 
-# variables
+# Variables
 
-# fonctions
-# fonction to launch the game
+# Functions
+# Function to launch the game.
 def start():
     global home_page
     home_page.destroy()
@@ -33,7 +33,7 @@ def start():
         Game.start_game()
 
 
-# fonction to go to the highscores page
+# Function to go to the highscores page.
 def see_scores():
     global home_page
     home_page.destroy()
@@ -41,7 +41,7 @@ def see_scores():
 
 
 
-#homepage fonction
+# Homepage function
 def home_window():
     global home_page
     #Create the window
@@ -51,37 +51,38 @@ def home_window():
     width = 500
     home_page.geometry(f"{width}x{height}")
 
-    #background color
+    # Background color.
     home_page.configure(background="green")
 
-    #get the location of the pictures
+    # Get the location of the pictures.
     image_location = "images/cards/"
-    #upload the Ace cards' images
+    # Upload the Ace cards' images.
     heart_ace = ImageTk.PhotoImage(Image.open(image_location + "ace_of_hearts.png"))
     club_ace = ImageTk.PhotoImage(Image.open(image_location + "ace_of_clubs.png"))
     diamond_ace = ImageTk.PhotoImage(Image.open(image_location + "ace_of_diamonds.png"))
     spade_ace = ImageTk.PhotoImage(Image.open(image_location + "ace_of_spades.png"))
 
-    #Labels creation
+    # Labels creation.
     label_heart_ace = tk.Label(home_page, image=heart_ace)
     label_club_ace = tk.Label(home_page, image=club_ace)
     label_diamond_ace = tk.Label(home_page, image=diamond_ace)
     label_spade_ace = tk.Label(home_page, image=spade_ace)
 
-    #label placement
+    # Label placement.
     label_heart_ace.place(relx=0.35, rely=0.25, anchor=tk.CENTER)
     label_club_ace.place(relx=0.45, rely=0.25, anchor=tk.CENTER)
     label_diamond_ace.place(relx=0.55, rely=0.25, anchor=tk.CENTER)
     label_spade_ace.place(relx=0.65, rely=0.25, anchor=tk.CENTER)
 
-    #Buttons
+    # Buttons
+    # Button start.
     start_button = tk.Button(home_page, text="Start", font=("Arial", 16), command=start)
     start_button.place(relx=0.5, rely=0.60, anchor=tk.CENTER)
-
+    # Button to open score page.
     button_score = tk.Button(home_page, text="Score", font=("Arial", 16), command=see_scores)
     button_score.place(relx=0.5, rely=0.70, anchor=tk.CENTER)
 
-    #launch window
+    # Launch window.
     home_page.mainloop()
 
 home_window()
