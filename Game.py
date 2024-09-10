@@ -15,6 +15,8 @@ import pygame
 import sys
 import os
 
+from pymunk.examples.constraints import screen
+
 
 def load_images(folder_path):
     # Charge all the cards' pictures from a specified folder.
@@ -42,7 +44,27 @@ def initialize_rectangles(images, start_x=100, start_y=100, spacing_x=50):
     return rectangles
 
 
+def place_object(row, col, obj):
+    grid[row][col] = obj
+
+
+
+
+def draw_grid():
+    for row in range(rows):
+        for col in range(cols):
+            # Dessiner le rectangle de la cellule
+            pygame.draw.rect(screen, (255, 255, 255), (col * cell_size, row * cell_size, cell_size, cell_size), 1)
+
+            # Si une cellule contient un objet, le dessiner
+            if grid[row][col]:
+                # Code pour dessiner l'objet ici (exemple : un cercle)
+                pygame.draw.circle(screen, (0, 0, 255), (col * cell_size + cell_size // 2, row * cell_size + cell_size // 2), 10)
+
+
+
 def start_game():
+    global grid
     pygame.init()
 
     #whindow's top part
@@ -65,8 +87,13 @@ def start_game():
     dragged_card = None
     offset_x = 0
     offset_y = 0
+    rows, cols = 13, 6
+    grid = [[None for i in cols] for i in rows]
+
+    place_object(2, 3, "mon_objet")
 
     while True:
+        draw_grid()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
