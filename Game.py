@@ -45,6 +45,9 @@ def initialize_rectangles(images, start_x=100, start_y=100, spacing_x=50):
 def start_game():
     pygame.init()
 
+    #whindow's top part
+    pygame.display.set_caption("Klondike Game")
+
     screen_width = 1280
     screen_height = 720
     screen = pygame.display.set_mode((screen_width, screen_height))

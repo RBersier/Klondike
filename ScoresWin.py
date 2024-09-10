@@ -17,7 +17,7 @@ def score_window():
     global home_page
     #Create the window
     score_page = tk.Tk()
-    score_page.title("Klondike")
+    score_page.title("Klondike Scores")
     height = 800
     width = 800
     score_page.geometry(f"{width}x{height}")

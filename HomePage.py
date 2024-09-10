@@ -46,7 +46,7 @@ def home_window():
     global home_page
     #Create the window
     home_page = tk.Tk()
-    home_page.title("Klondike")
+    home_page.title("Klondike Menu")
     height = 500
     width = 500
     home_page.geometry(f"{width}x{height}")
