@@ -45,8 +45,8 @@ def place_object(row, col, obj):
     grid[row][col] = obj
 
 def draw_grid():
-    rows, cols = 13, 6
-    cell_size = 12
+    rows, cols = 14, 7
+    cell_size = 50
     for row in range(rows):
         for col in range(cols):
             # Dessiner le rectangle de la cellule
@@ -83,7 +83,7 @@ def start_game():
     dragged_card = None
     offset_x = 0
     offset_y = 0
-    rows, cols = 13, 6
+    rows, cols = 14, 20
     grid = []
     for i in range(rows):
         grid.append([])
@@ -125,5 +125,5 @@ def start_game():
 
         pygame.display.flip()
 
-# if __name__ == "__main__":
-#    start_game()
+if __name__ == "__main__":
+    start_game()
