@@ -6,8 +6,8 @@ Start date: 03.09.24
 Latest update: 24.09.24
 Version : 0.2
 
-Description:    this file contains the code for
-                the game
+Description:    this file contains the code
+                for the game
 """
 
 # Imports

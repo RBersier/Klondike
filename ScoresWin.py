@@ -3,8 +3,8 @@ Project : Klondike
 Module : Projet Dev
 Author : Ryan BERSIER & Alexis LEAKOS
 Start date: 03.09.24
-Latest update: 03.09.24
-Version : 0.1
+Latest update: 24.09.24
+Version : 0.2
 
 Description:    this file contains the code for
                 the window with the highscores board of the game.
@@ -13,7 +13,7 @@ Description:    this file contains the code for
 # Imports
 import tkinter as tk
 from tkinter import ttk
-from database import open_dbconnection, close_dbconnection, get_top_scores
+from Database import open_dbconnection, close_dbconnection, get_top_scores
 
 # functions
 class ScoreboardWindow(tk.Toplevel):
