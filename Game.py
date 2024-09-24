@@ -46,11 +46,12 @@ def place_object(row, col, obj):
 
 def draw_grid():
     rows, cols = 14, 7
-    cell_size = 50
+    cell_size_x = 52
+    cell_size_y = 183
     for row in range(rows):
         for col in range(cols):
             # Dessiner le rectangle de la cellule
-            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(col * cell_size, row * cell_size, cell_size, cell_size), 1)
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(col * cell_size_y, row * cell_size_x, cell_size_y, cell_size_x), 1)
             #print(row, col)
             # Si une cellule contient un objet, le dessiner
             #if grid[row][col]:
