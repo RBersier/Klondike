@@ -118,8 +118,8 @@ def start_game():
 
     # Window setup
     pygame.display.set_caption("Klondike Game")
-    screen_width = 1280
-    screen_height = 720
+    screen_width = 850
+    screen_height = 850
     screen = pygame.display.set_mode((screen_width, screen_height))
 
     dark_green = (0, 100, 0)
