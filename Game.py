@@ -1,15 +1,3 @@
-"""
-Project : Klondike
-Module : Projet Dev
-Author : Ryan BERSIER & Alexis LEAKOS
-Start date: 03.09.24
-Latest update: 24.09.24
-Version : 0.2
-
-Description:    this file contains the code
-                for the game
-"""
-
 # Imports
 import pygame
 import sys
@@ -73,7 +61,24 @@ def initialize_rectangles_for_klondike(images, slots_images):
     return rectangles, tableau_piles, foundation_piles, stock_pile
 
 
-def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile):
+def draw_card_from_stock(card_rectangles, stock_pile, drawn_cards):
+    """
+    Draw a card from the stockpile and place it on the draw pile (empty slot).
+    Update the card rectangles to reflect the drawn card's position.
+    """
+    if stock_pile:  # Only draw if there are cards in the stockpile
+        card_name = stock_pile.pop()  # Get the top card from the stockpile
+        draw_pile_rect = card_rectangles['draw_pile']["rect"]
+
+        # Update the drawn card's position (place it directly on top of the draw pile)
+        new_rect = card_rectangles[card_name]["rect"]
+        new_rect.topleft = draw_pile_rect.topleft  # Correctly place it over the draw pile
+        card_rectangles[card_name] = {"rect": new_rect, "face_up": True, "drawn": True}
+
+        drawn_cards.append(card_name)  # Track the drawn card
+
+
+def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile, drawn_cards):
     """
     Draw all the card piles (tableau, stock, foundations) and empty slots.
     """
@@ -107,13 +112,20 @@ def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_
                     screen.blit(slots_images["python_card_back"], rect)  # Draw face-down cards (card back).
 
     # Draw stockpile cards (on the far left)
-    for card_name, card_info in card_rectangles.items():
-        if "stock" in card_info:
-            rect = card_info["rect"]
-            screen.blit(slots_images["python_card_back"], rect)
+    if stock_pile:  # Only draw the stockpile if it still has cards.
+        for card_name, card_info in card_rectangles.items():
+            if "stock" in card_info and not card_info.get("drawn"):
+                rect = card_info["rect"]
+                screen.blit(slots_images["python_card_back"], rect)
 
-    # Draw the draw pile (empty slot next to the stockpile)
-    screen.blit(slots_images["empty_slot"], card_rectangles['draw_pile']["rect"])
+    # Draw the draw pile (empty slot or the drawn card)
+    if not drawn_cards:
+        screen.blit(slots_images["empty_slot"], card_rectangles['draw_pile']["rect"])  # Empty slot
+    else:
+        # If there is a drawn card, draw the topmost drawn card on the draw pile
+        top_drawn_card = drawn_cards[-1]  # Get the topmost drawn card
+        card_info = card_rectangles[top_drawn_card]
+        screen.blit(card_images[top_drawn_card], card_info["rect"])
 
 
 def start_game():
@@ -144,6 +156,9 @@ def start_game():
     offset_x = 0
     offset_y = 0
 
+    # Track drawn cards separately
+    drawn_cards = []
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -151,6 +166,10 @@ def start_game():
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Check if the stockpile is clicked to draw a card to the draw pile
+                if stock_pile and card_rectangles[stock_pile[-1]]["rect"].collidepoint(event.pos):
+                    draw_card_from_stock(card_rectangles, stock_pile, drawn_cards)
+
                 # Check if the mouse clicked on a card.
                 for i, (card_name, card_info) in enumerate(card_rect_list):
                     rect = card_info["rect"]
@@ -181,7 +200,7 @@ def start_game():
         screen.fill(dark_green)
 
         # Draw all card piles including stock, foundations (with ace slots), tableau (with empty slots), and draw pile.
-        draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile)
+        draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile, drawn_cards)
 
         # Draw the cards in order
         for card_name, card_info in card_rect_list:
@@ -191,6 +210,7 @@ def start_game():
                     screen.blit(card_images[card_name], rect)  # Draw face-up cards.
 
         pygame.display.flip()
+
 
 if __name__ == "__main__":
     start_game()
