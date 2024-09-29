@@ -84,8 +84,9 @@ def draw_card_from_stock(card_rectangles, stock_pile, drawn_cards):
 
         # Update the drawn card's position (place it directly on top of the draw pile)
         new_rect = card_rectangles[card_name]["rect"]
-        new_rect.topleft = draw_pile_rect.topleft  # Correctly place it over the draw pile
-        card_rectangles[card_name] = {"rect": new_rect, "face_up": True, "drawn": True}
+        new_rect.topleft = draw_pile_rect.topleft  # Place it over the draw pile, without changing the empty slot
+
+        card_rectangles[card_name] = {"rect": new_rect, "face_up": True, "movable": True}  # Mark the drawn card as movable
 
         drawn_cards.append(card_name)  # Track the drawn card
 
@@ -130,14 +131,15 @@ def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_
                 rect = card_info["rect"]
                 screen.blit(slots_images["python_card_back"], rect)
 
-    # Draw the draw pile (empty slot or the drawn card)
-    if not drawn_cards:
-        screen.blit(slots_images["empty_slot"], card_rectangles['draw_pile']["rect"])  # Empty slot
-    else:
-        # If there is a drawn card, draw the topmost drawn card on the draw pile
-        top_drawn_card = drawn_cards[-1]  # Get the topmost drawn card
-        card_info = card_rectangles[top_drawn_card]
-        screen.blit(card_images[top_drawn_card], card_info["rect"])
+    # Draw the draw pile (empty slot or the drawn cards)
+    draw_pile_rect = card_rectangles['draw_pile']["rect"]
+    screen.blit(slots_images["empty_slot"], draw_pile_rect)  # Always draw the empty slot
+
+    # If there are drawn cards, draw them on top of the empty slot
+    if drawn_cards:
+        for card_name in drawn_cards:
+            card_info = card_rectangles[card_name]
+            screen.blit(card_images[card_name], card_info["rect"])
 
 
 def start_game():
@@ -182,17 +184,33 @@ def start_game():
                 if stock_pile and card_rectangles[stock_pile[-1]]["rect"].collidepoint(event.pos):
                     draw_card_from_stock(card_rectangles, stock_pile, drawn_cards)
 
-                # Check if the mouse clicked on a card.
-                for i, (card_name, card_info) in enumerate(card_rect_list):
+                # Check if the mouse clicked on a drawn card (so that it can be dragged)
+                for card_name in drawn_cards:
+                    card_info = card_rectangles[card_name]
                     rect = card_info["rect"]
-                    if rect.collidepoint(event.pos) and card_info["face_up"]:
+                    if rect.collidepoint(event.pos) and card_info["face_up"]:  # Only allow dragging if face-up
                         dragging = True
                         dragged_card = card_name
                         offset_x = rect.x - event.pos[0]
                         offset_y = rect.y - event.pos[1]
 
-                        # Move the dragged card to the end of the list for drawing last (on top)
-                        card_rect_list.append(card_rect_list.pop(i))
+                        # Move the selected card to the top of the rendering order
+                        drawn_cards.remove(card_name)
+                        drawn_cards.append(card_name)  # Add it to the end to render last (on top)
+                        break
+
+                # Also check tableau cards for dragging (if needed).
+                for i, (card_name, card_info) in enumerate(card_rect_list):
+                    rect = card_info["rect"]
+                    if rect.collidepoint(event.pos) and card_info["face_up"]:  # Only allow dragging if face-up
+                        dragging = True
+                        dragged_card = card_name
+                        offset_x = rect.x - event.pos[0]
+                        offset_y = rect.y - event.pos[1]
+
+                        # Move the selected card to the top of the rendering order
+                        card_rect_list.remove((card_name, card_info))
+                        card_rect_list.append((card_name, card_info))  # Add it to the end to render last (on top)
                         break
 
             elif event.type == pygame.MOUSEBUTTONUP:
@@ -208,6 +226,12 @@ def start_game():
                         if card_name == dragged_card:
                             card_info["rect"].x = event.pos[0] + offset_x
                             card_info["rect"].y = event.pos[1] + offset_y
+
+                    # Also move drawn cards if they are being dragged
+                    for card_name in drawn_cards:
+                        if card_name == dragged_card:
+                            card_rectangles[card_name]["rect"].x = event.pos[0] + offset_x
+                            card_rectangles[card_name]["rect"].y = event.pos[1] + offset_y
 
         screen.fill(dark_green)
 
