@@ -41,7 +41,7 @@ def initialize_rectangles_for_klondike(images, slots_images):
 
     # Distribute cards to tableau piles with only the top card face-up.
     start_x = 50
-    spacing_x = 110  # Reduced the spacing a bit
+    spacing_x = 110
     for i in range(7):
         for j in range(i + 1):  # Incrementally more cards in each pile.
             card_name = deck.pop()
@@ -60,19 +60,20 @@ def initialize_rectangles_for_klondike(images, slots_images):
         stock_pile.append(card_name)
 
     # Draw pile rectangle (next to the stockpile).
-    draw_pile_rect = pygame.Rect(stock_x + 110, stock_y, 71, 96)  # Adjusted x to bring closer to stockpile
+    draw_pile_rect = pygame.Rect(stock_x + 110, stock_y, 71, 96)
     rectangles['draw_pile'] = {"rect": draw_pile_rect, "face_up": False, "draw_pile": True}
 
-    # Foundation piles start empty, but we'll define their positions.
-    foundation_x_start = 380  # Reduced to bring foundation closer
+    # Foundation piles (for each ace) starting empty, defined by positions.
+    foundation_x_start = 380
     foundation_y = 50
     for i in range(4):
-        foundation_rect = pygame.Rect(foundation_x_start + i * spacing_x, foundation_y, 71, 96)  # 71x96 is standard card size
+        foundation_rect = pygame.Rect(foundation_x_start + i * spacing_x, foundation_y, 71, 96)
         rectangles[f'foundation_{i}'] = {"rect": foundation_rect, "face_up": False, "foundation": i}
 
     return rectangles, tableau_piles, foundation_piles, stock_pile
 
-def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles):
+
+def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile):
     """
     Draw all the card piles (tableau, stock, foundations) and empty slots.
     """
@@ -81,7 +82,9 @@ def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_
     for i, slot_name in enumerate(foundation_slots):
         foundation_key = f'foundation_{i}'
         rect = card_rectangles[foundation_key]["rect"]
-        if len(foundation_piles[i]) == 0:  # If foundation is empty, draw the specific ace slot image
+
+        # If the foundation pile is empty, show the empty slot image for that foundation
+        if len(foundation_piles[i]) == 0:
             screen.blit(slots_images[slot_name], rect)
         else:
             # If foundation has cards, draw the top card (face-up)
@@ -91,7 +94,7 @@ def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_
     # Draw tableau slots (empty slots for tableau piles)
     for i in range(7):
         if len(tableau_piles[i]) == 0:  # If a tableau pile is empty, draw the empty slot.
-            tableau_rect = pygame.Rect(50 + i * 110, 300, 71, 96)  # Reduced spacing between tableau slots
+            tableau_rect = pygame.Rect(50 + i * 110, 300, 71, 96)  # Adjusted Y for tableau slots
             screen.blit(slots_images["empty_slot"], tableau_rect)
         else:
             # Draw cards (face-up and face-down cards in tableau)
@@ -112,6 +115,7 @@ def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_
     # Draw the draw pile (empty slot next to the stockpile)
     screen.blit(slots_images["empty_slot"], card_rectangles['draw_pile']["rect"])
 
+
 def start_game():
     global screen
     pygame.init()
@@ -131,6 +135,9 @@ def start_game():
     # Initialize card rectangles for Klondike
     card_rectangles, tableau_piles, foundation_piles, stock_pile = initialize_rectangles_for_klondike(card_images, slots_images)
 
+    # Convert dictionary to list for ordered drawing
+    card_rect_list = list(card_rectangles.items())
+
     # Variables to follow the state of the movement.
     dragging = False
     dragged_card = None
@@ -145,13 +152,16 @@ def start_game():
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # Check if the mouse clicked on a card.
-                for card_name, card_info in card_rectangles.items():
+                for i, (card_name, card_info) in enumerate(card_rect_list):
                     rect = card_info["rect"]
                     if rect.collidepoint(event.pos) and card_info["face_up"]:
                         dragging = True
                         dragged_card = card_name
                         offset_x = rect.x - event.pos[0]
                         offset_y = rect.y - event.pos[1]
+
+                        # Move the dragged card to the end of the list for drawing last (on top)
+                        card_rect_list.append(card_rect_list.pop(i))
                         break
 
             elif event.type == pygame.MOUSEBUTTONUP:
@@ -163,13 +173,22 @@ def start_game():
             elif event.type == pygame.MOUSEMOTION:
                 if dragging and dragged_card:
                     # Move the card with the mouse
-                    card_rectangles[dragged_card]["rect"].x = event.pos[0] + offset_x
-                    card_rectangles[dragged_card]["rect"].y = event.pos[1] + offset_y
+                    for card_name, card_info in card_rect_list:
+                        if card_name == dragged_card:
+                            card_info["rect"].x = event.pos[0] + offset_x
+                            card_info["rect"].y = event.pos[1] + offset_y
 
         screen.fill(dark_green)
 
         # Draw all card piles including stock, foundations (with ace slots), tableau (with empty slots), and draw pile.
-        draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles)
+        draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile)
+
+        # Draw the cards in order
+        for card_name, card_info in card_rect_list:
+            if "rect" in card_info:
+                rect = card_info["rect"]
+                if "face_up" in card_info and card_info["face_up"]:
+                    screen.blit(card_images[card_name], rect)  # Draw face-up cards.
 
         pygame.display.flip()
 
