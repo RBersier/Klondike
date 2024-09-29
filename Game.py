@@ -185,7 +185,7 @@ def start_game():
                     draw_card_from_stock(card_rectangles, stock_pile, drawn_cards)
 
                 # Check if the mouse clicked on a drawn card (so that it can be dragged)
-                for card_name in drawn_cards:
+                for card_name in reversed(drawn_cards):  # Check drawn cards in reverse order
                     card_info = card_rectangles[card_name]
                     rect = card_info["rect"]
                     if rect.collidepoint(event.pos) and card_info["face_up"]:  # Only allow dragging if face-up
@@ -193,10 +193,9 @@ def start_game():
                         dragged_card = card_name
                         offset_x = rect.x - event.pos[0]
                         offset_y = rect.y - event.pos[1]
-
-                        # Move the selected card to the top of the rendering order
+                        # Move the touched card to the front of the drawn cards list
                         drawn_cards.remove(card_name)
-                        drawn_cards.append(card_name)  # Add it to the end to render last (on top)
+                        drawn_cards.append(card_name)  # Place it at the end so it draws last (on top)
                         break
 
                 # Also check tableau cards for dragging (if needed).
@@ -207,10 +206,9 @@ def start_game():
                         dragged_card = card_name
                         offset_x = rect.x - event.pos[0]
                         offset_y = rect.y - event.pos[1]
-
-                        # Move the selected card to the top of the rendering order
+                        # Move the touched card to the front of the card_rect_list
                         card_rect_list.remove((card_name, card_info))
-                        card_rect_list.append((card_name, card_info))  # Add it to the end to render last (on top)
+                        card_rect_list.append((card_name, card_info))  # Move to the end to ensure it's drawn on top
                         break
 
             elif event.type == pygame.MOUSEBUTTONUP:
