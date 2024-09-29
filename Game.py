@@ -73,7 +73,7 @@ def initialize_rectangles_for_klondike(images, slots_images):
     return rectangles, tableau_piles, foundation_piles, stock_pile
 
 
-def draw_card_from_stock(card_rectangles, stock_pile, drawn_cards):
+def draw_card_from_stock(card_rectangles, stock_pile, unified_card_list):
     """
     Draw a card from the stockpile and place it on the draw pile (empty slot).
     Update the card rectangles to reflect the drawn card's position.
@@ -88,10 +88,10 @@ def draw_card_from_stock(card_rectangles, stock_pile, drawn_cards):
 
         card_rectangles[card_name] = {"rect": new_rect, "face_up": True, "movable": True}  # Mark the drawn card as movable
 
-        drawn_cards.append(card_name)  # Track the drawn card
+        unified_card_list.append((card_name, card_rectangles[card_name]))  # Add it to the unified card list
 
 
-def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile, drawn_cards):
+def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile):
     """
     Draw all the card piles (tableau, stock, foundations) and empty slots.
     """
@@ -131,15 +131,9 @@ def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_
                 rect = card_info["rect"]
                 screen.blit(slots_images["python_card_back"], rect)
 
-    # Draw the draw pile (empty slot or the drawn cards)
+    # Draw the draw pile (empty slot)
     draw_pile_rect = card_rectangles['draw_pile']["rect"]
-    screen.blit(slots_images["empty_slot"], draw_pile_rect)  # Always draw the empty slot
-
-    # If there are drawn cards, draw them on top of the empty slot
-    if drawn_cards:
-        for card_name in drawn_cards:
-            card_info = card_rectangles[card_name]
-            screen.blit(card_images[card_name], card_info["rect"])
+    screen.blit(slots_images["empty_slot"], draw_pile_rect)
 
 
 def start_game():
@@ -161,17 +155,19 @@ def start_game():
     # Initialize card rectangles for Klondike
     card_rectangles, tableau_piles, foundation_piles, stock_pile = initialize_rectangles_for_klondike(card_images, slots_images)
 
-    # Convert dictionary to list for ordered drawing
-    card_rect_list = list(card_rectangles.items())
+    # Unified card list: keeps track of all cards to ensure proper z-order (draw order)
+    unified_card_list = []
+
+    # Add all tableau and foundation cards to the unified card list for z-order management
+    for card_name, card_info in card_rectangles.items():
+        if "tableau" in card_info or "foundation" in card_info:
+            unified_card_list.append((card_name, card_info))
 
     # Variables to follow the state of the movement.
     dragging = False
     dragged_card = None
     offset_x = 0
     offset_y = 0
-
-    # Track drawn cards separately
-    drawn_cards = []
 
     while True:
         for event in pygame.event.get():
@@ -182,33 +178,19 @@ def start_game():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # Check if the stockpile is clicked to draw a card to the draw pile
                 if stock_pile and card_rectangles[stock_pile[-1]]["rect"].collidepoint(event.pos):
-                    draw_card_from_stock(card_rectangles, stock_pile, drawn_cards)
+                    draw_card_from_stock(card_rectangles, stock_pile, unified_card_list)
 
-                # Check if the mouse clicked on a drawn card (so that it can be dragged)
-                for card_name in reversed(drawn_cards):  # Check drawn cards in reverse order
-                    card_info = card_rectangles[card_name]
+                # Check if the mouse clicked on any card (tableau, foundation, or drawpile)
+                for i, (card_name, card_info) in enumerate(reversed(unified_card_list)):  # Iterate in reverse to check topmost cards first
                     rect = card_info["rect"]
-                    if rect.collidepoint(event.pos) and card_info["face_up"]:  # Only allow dragging if face-up
+                    if rect.collidepoint(event.pos) and card_info.get("face_up"):  # Only allow dragging if face-up
                         dragging = True
                         dragged_card = card_name
                         offset_x = rect.x - event.pos[0]
                         offset_y = rect.y - event.pos[1]
-                        # Move the touched card to the front of the drawn cards list
-                        drawn_cards.remove(card_name)
-                        drawn_cards.append(card_name)  # Place it at the end so it draws last (on top)
-                        break
-
-                # Also check tableau cards for dragging (if needed).
-                for i, (card_name, card_info) in enumerate(card_rect_list):
-                    rect = card_info["rect"]
-                    if rect.collidepoint(event.pos) and card_info["face_up"]:  # Only allow dragging if face-up
-                        dragging = True
-                        dragged_card = card_name
-                        offset_x = rect.x - event.pos[0]
-                        offset_y = rect.y - event.pos[1]
-                        # Move the touched card to the front of the card_rect_list
-                        card_rect_list.remove((card_name, card_info))
-                        card_rect_list.append((card_name, card_info))  # Move to the end to ensure it's drawn on top
+                        # Move the touched card to the front of the unified card list
+                        unified_card_list.pop(len(unified_card_list) - 1 - i)  # Remove the card from its position
+                        unified_card_list.append((card_name, card_info))  # Place it at the end so it draws last (on top)
                         break
 
             elif event.type == pygame.MOUSEBUTTONUP:
@@ -220,24 +202,18 @@ def start_game():
             elif event.type == pygame.MOUSEMOTION:
                 if dragging and dragged_card:
                     # Move the card with the mouse
-                    for card_name, card_info in card_rect_list:
+                    for card_name, card_info in unified_card_list:
                         if card_name == dragged_card:
                             card_info["rect"].x = event.pos[0] + offset_x
                             card_info["rect"].y = event.pos[1] + offset_y
 
-                    # Also move drawn cards if they are being dragged
-                    for card_name in drawn_cards:
-                        if card_name == dragged_card:
-                            card_rectangles[card_name]["rect"].x = event.pos[0] + offset_x
-                            card_rectangles[card_name]["rect"].y = event.pos[1] + offset_y
-
         screen.fill(dark_green)
 
         # Draw all card piles including stock, foundations (with ace slots), tableau (with empty slots), and draw pile.
-        draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile, drawn_cards)
+        draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_piles, foundation_piles, stock_pile)
 
-        # Draw the cards in order
-        for card_name, card_info in card_rect_list:
+        # Draw the cards from the unified list in the correct order (last card in the list will be drawn on top)
+        for card_name, card_info in unified_card_list:
             if "rect" in card_info:
                 rect = card_info["rect"]
                 if "face_up" in card_info and card_info["face_up"]:
