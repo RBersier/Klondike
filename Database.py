@@ -63,7 +63,7 @@ def get_top_scores(conn):
 
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT name.players AS player, score.games, datetime.games FROM games INNER JOIN players ON games.Players_id = players.id; ORDER BY score DESC LIMIT 10")
+        cursor.execute("SELECT players.name AS player, games.score AS score, games.datetime AS date FROM games INNER JOIN players ON games.Players_id = players.id; ORDER BY score DESC LIMIT 10")
         top_scores = cursor.fetchall()
         return top_scores
     except mysql.connector.Error as e:
