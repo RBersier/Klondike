@@ -17,14 +17,58 @@ from tkinter import messagebox
 
 # functions ...
 # ...to open the database
-def open_dbconnection():
-    global db_connection
-    db_connection = mysql.connector.connect(host='127.0.0.1', port='3306', user='CPNV',
-                                            password='Pa$$w0rd', database='solitaire',
-                                            buffered=True, autocommit=True)
-# ...to close the database
-def close_dbconnection():
-    db_connection.close()
+import mysql.connector
+
+def db_connection(host, user, password, database):
+    """Opens a connection to the MySQL database.
+
+    Args:
+        host: The hostname of the MySQL server.
+        user: The username for the database connection.
+        password: The password for the database connection.
+        database: The name of the database to connect to.
+
+    Returns:
+        The database connection object.
+    """
+
+    try:
+        conn = mysql.connector.connect(
+            host=host,
+            user=user,
+            password=password,
+            database=database
+        )
+        return conn
+    except mysql.connector.Error as e:
+        print(f"Error opening database connection: {e}")
+        return None
+
+def close_connection(conn):
+    """Closes the database connection."""
+    if conn:
+        conn.close()
+
+
+# ...get only the top score
+def get_top_scores(conn):
+    """Retrieves the top scores from the MySQL database.
+
+    Args:
+        conn: The database connection object.
+
+    Returns:
+        A list of tuples representing the top scores.
+    """
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT name.players AS player, score.games, datetime.games FROM games INNER JOIN players ON games.Players_id = players.id; ORDER BY score DESC LIMIT 10")
+        top_scores = cursor.fetchall()
+        return top_scores
+    except mysql.connector.Error as e:
+        print(f"Error getting top scores: {e}")
+        return []
 
 # ...to insert a new student in the students' data
 def add_player(pseudo):
@@ -42,13 +86,4 @@ def get_player_id_by_name(pseudo):
     cursor.close()
     return result_id
 
-# ...get only the top score
-def get_top_scores():
-    query = "SELECT RANK() OVER (ORDER BY Games.score DESC) AS rank, Players.name AS player, Games.score, Games.datetime FROM Games INNER JOIN Players ON Games.Players_id = Players.id ORDER BY Games.score DESC LIMIT 10; "
 
-    cursor = db_connection.cursor()
-    cursor.execute(query)
-    top_scores = cursor.fetchall()
-    cursor.close()
-
-    return top_scores

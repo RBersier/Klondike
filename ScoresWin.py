@@ -11,13 +11,11 @@ Description:    this file contains the code for
 """
 
 # Imports
-import tkinter as tk
-from tkinter import ttk
-from Database import open_dbconnection, close_dbconnection, get_top_scores
-
+from Database import db_connection, close_connection, get_top_scores
 import tkinter as tk
 from tkinter import ttk
 
+# Functions
 def show_scoreboard(parent):
     """Displays a scoreboard window.
 
@@ -31,7 +29,6 @@ def show_scoreboard(parent):
 
     # Create a treeview widget
     treeview = ttk.Treeview(scoreboard_window, columns=("rank", "player", "score", "date"))
-    treeview.heading("rank", text="Rank")
     treeview.heading("player", text="Player")
     treeview.heading("score", text="Score")
     treeview.heading("date", text="Date")
@@ -43,21 +40,25 @@ def show_scoreboard(parent):
 
     # Load the top scores from the database
     def load_scores():
-        # Open the database connection
-        open_dbconnection()
+        try:
+            # Open the database connection
+            db_connection()
 
-        # Get the top scores from the database
-        top_scores = get_top_scores()
+            # Get the top scores from the database
+            top_scores = get_top_scores()
 
-        # Clear the treeview
-        treeview.delete(*treeview.get_children())
+            # Clear the treeview
+            treeview.delete(*treeview.get_children())
 
-        # Insert the scores into the treeview
-        for i, (rank, player, score, date) in enumerate(top_scores, start=1):
-            treeview.insert("", "end", values=(i, player, score, date))
+            # Insert the scores into the treeview
+            for i, (rank, player, score, date) in enumerate(top_scores, start=1):
+                treeview.insert("", "end", values=(i, player, score, date))
 
-        # Close the database connection
-        close_dbconnection()
+            # Close the database connection
+            close_connection()
+        except Exception as e:
+            # Handle database connection or query errors
+            print(f"Error loading scores: {e}")
 
     # Load the scores initially
     load_scores()
