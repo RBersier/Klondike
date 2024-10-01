@@ -28,7 +28,7 @@ def close_dbconnection():
 
 # ...to insert a new student in the students' data
 def add_player(pseudo):
-    query = "INSERT INTO players (name) VALUES (%s)"
+    query = "INSERT INT players (name) VALUES (%s)"
     cursor = db_connection.cursor()
     cursor.execute(query, (pseudo,))
     cursor.close()
@@ -44,20 +44,7 @@ def get_player_id_by_name(pseudo):
 
 # ...get only the top score
 def get_top_scores():
-    query = """
-    SELECT
-        RANK() OVER (ORDER BY Games.score DESC) AS rank,
-        Players.name AS player,
-        Games.score,
-        Games.datetime
-    FROM
-        Games
-    INNER JOIN
-        Players ON Games.Players_id = Players.id
-    ORDER BY
-        Games.score DESC
-    LIMIT 10;
-    """
+    query = "SELECT RANK() OVER (ORDER BY Games.score DESC) AS rank, Players.name AS player, Games.score, Games.datetime FROM Games INNER JOIN Players ON Games.Players_id = Players.id ORDER BY Games.score DESC LIMIT 10; "
 
     cursor = db_connection.cursor()
     cursor.execute(query)

@@ -15,32 +15,34 @@ import tkinter as tk
 from tkinter import ttk
 from Database import open_dbconnection, close_dbconnection, get_top_scores
 
-# functions
-class ScoreboardWindow(tk.Toplevel):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.title("Scoreboard")
+import tkinter as tk
+from tkinter import ttk
 
-        # Create a treeview widget to display the scores
-        self.treeview = ttk.Treeview(self, columns=("rank", "player", "score", "date"))
-        self.treeview.heading("rank", text="Rank")
-        self.treeview.heading("player", text="Player")
-        self.treeview.heading("score", text="Score")
-        self.treeview.heading("date", text="Date")
-        self.treeview.column("rank", width=50)
-        self.treeview.column("player", width=150)
-        self.treeview.column("score", width=100)
-        self.treeview.column("date", width=150)
-        self.treeview.pack(fill="both", expand=True)
+def show_scoreboard(parent):
+    """Displays a scoreboard window.
 
-        # Button to close the window
-        close_button = tk.Button(self, text="Close", command=self.destroy)
-        close_button.pack(side="bottom", padx=10, pady=10)
+    Args:
+        parent: The parent window.
+    """
 
-        # Load the top scores from the database
-        self.load_scores()
+    # Create the main window
+    scoreboard_window = tk.Toplevel(parent)
+    scoreboard_window.title("Scoreboard")
 
-    def load_scores(self):
+    # Create a treeview widget
+    treeview = ttk.Treeview(scoreboard_window, columns=("rank", "player", "score", "date"))
+    treeview.heading("rank", text="Rank")
+    treeview.heading("player", text="Player")
+    treeview.heading("score", text="Score")
+    treeview.heading("date", text="Date")
+    treeview.column("rank", width=50)
+    treeview.column("player", width=150)
+    treeview.column("score", width=100)
+    treeview.column("date", width=150)
+    treeview.pack(fill="both", expand=True)
+
+    # Load the top scores from the database
+    def load_scores():
         # Open the database connection
         open_dbconnection()
 
@@ -48,17 +50,23 @@ class ScoreboardWindow(tk.Toplevel):
         top_scores = get_top_scores()
 
         # Clear the treeview
-        self.treeview.delete(*self.treeview.get_children())
+        treeview.delete(*treeview.get_children())
 
         # Insert the scores into the treeview
         for i, (rank, player, score, date) in enumerate(top_scores, start=1):
-            self.treeview.insert("", "end", values=(i, player, score, date))
+            treeview.insert("", "end", values=(i, player, score, date))
 
         # Close the database connection
         close_dbconnection()
 
-def show_scoreboard(parent):
-    scoreboard_window = ScoreboardWindow(parent)
+    # Load the scores initially
+    load_scores()
+
+    # Create a button to close the window
+    close_button = tk.Button(scoreboard_window, text="Close", command=scoreboard_window.destroy)
+    close_button.pack(side="bottom", padx=10, pady=10)
+
+    # Start the main loop for the scoreboard window
     scoreboard_window.mainloop()
 
 def score_window():
