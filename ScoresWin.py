@@ -3,7 +3,7 @@ Project : Klondike
 Module : Projet Dev
 Author : Ryan BERSIER & Alexis LEAKOS
 Start date: 03.09.24
-Latest update: 24.09.24
+Latest update: 08.10.24
 Version : 0.2
 
 Description:    this file contains the code for
@@ -14,8 +14,16 @@ Description:    this file contains the code for
 from Database import db_connection, close_connection, get_top_scores
 import tkinter as tk
 from tkinter import ttk
+from Game import start_game
+
 
 # Functions
+ # command for the button play
+def launch_game(parent):
+    parent.destroy()
+    start_game()
+
+# windows settings
 def show_scoreboard(parent):
     global score_window, treeview
     """Displays a scoreboard window.
@@ -45,6 +53,9 @@ def show_scoreboard(parent):
     # Create a button to close the window
     close_button = tk.Button(parent, text="Close", command=parent.destroy)
     close_button.pack(side="bottom", padx=10, pady=10)
+    # Create a button to open the game window
+    play_button = tk.Button(parent, text="Play", command=lambda: launch_game(parent))
+    play_button.pack(side="bottom", padx=10, pady=10)
 
 # Load the top scores from the database
 def load_scores():
