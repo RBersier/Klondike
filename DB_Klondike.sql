@@ -9,29 +9,30 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema mydb
+-- Schema solitaire
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
-USE `mydb` ;
+CREATE SCHEMA IF NOT EXISTS `solitaire` DEFAULT CHARACTER SET utf8 ;
+USE `solitaire` ;
 
 -- -----------------------------------------------------
--- Table `mydb`.`Players`
+-- Table `solitaire`.`Players`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mydb`.`Players` ;
+DROP TABLE IF EXISTS `solitaire`.`Players` ;
 
-CREATE TABLE IF NOT EXISTS `mydb`.`Players` (
+CREATE TABLE IF NOT EXISTS `solitaire`.`Players` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+  PRIMARY KEY (`id`),
+  UNIQUE (name)
+) ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`Games`
+-- Table `solitaire`.`Games`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `mydb`.`Games` ;
+DROP TABLE IF EXISTS `solitaire`.`Games` ;
 
-CREATE TABLE IF NOT EXISTS `mydb`.`Games` (
+CREATE TABLE IF NOT EXISTS `solitaire`.`Games` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `score` INT NOT NULL,
   `datetime` DATETIME NOT NULL,
@@ -40,10 +41,10 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Games` (
   INDEX `fk_Games_Players_idx` (`Players_id` ASC) VISIBLE,
   CONSTRAINT `fk_Games_Players`
     FOREIGN KEY (`Players_id`)
-    REFERENCES `mydb`.`Players` (`id`)
+    REFERENCES `solitaire`.`Players` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+    ON UPDATE NO ACTION
+) ENGINE = InnoDB;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
