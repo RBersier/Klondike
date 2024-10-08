@@ -3,8 +3,8 @@ Project : Klondike
 Module : Projet Dev
 Author : Ryan BERSIER & Alexis LEAKOS
 Start date: 03.09.24
-Latest update: 29.09.24
-Version : 0.2
+Latest update: 08.10.24
+Version : 0.3
 
 Description:    this file contains the code
                 for the game.
@@ -135,6 +135,33 @@ def draw_card_piles(screen, card_rectangles, card_images, slots_images, tableau_
     screen.blit(slots_images["empty_slot"], draw_pile_rect)
 
 
+def is_valid_move(top_card_name, dragged_card_name):
+    """
+    Check if the dragged card can be placed on top of the top card in a tableau pile.
+    Klondike rules:
+    - The dragged card must be one rank lower than the top card.
+    - The dragged card must be of the opposite color.
+    """
+    # Extract rank and suit information from the card names (e.g., 'ace_of_spades', '2_of_hearts', etc.)
+    top_rank, top_suit = top_card_name.split("_")[0], top_card_name.split("_")[2]
+    dragged_rank, dragged_suit = dragged_card_name.split("_")[0], dragged_card_name.split("_")[2]
+
+    # Define the rank order for comparison
+    rank_order = ["ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king"]
+
+    # Check if the dragged card is one rank lower and is of opposite color
+    return (rank_order.index(dragged_rank) == rank_order.index(top_rank) - 1) and \
+        (is_opposite_color(top_suit, dragged_suit))
+
+
+def is_opposite_color(suit1, suit2):
+    """ Check if two suits are of opposite colors (red vs black) """
+    red_suits = {"hearts", "diamonds"}
+    black_suits = {"spades", "clubs"}
+
+    return (suit1 in red_suits and suit2 in black_suits) or (suit1 in black_suits and suit2 in red_suits)
+
+
 def start_game():
     global screen
     pygame.init()
@@ -184,63 +211,95 @@ def start_game():
                 for i, (card_name, card_info) in enumerate(
                         reversed(unified_card_list)):  # Iterate in reverse to check topmost cards first
                     rect = card_info["rect"]
-                    if rect.collidepoint(event.pos) and card_info.get("face_up"):  # Only allow dragging if face-up
-                        dragging = True
-                        dragged_card = card_name
-                        offset_x = rect.x - event.pos[0]
-                        offset_y = rect.y - event.pos[1]
-                        # Move the touched card to the front of the unified card list
-                        unified_card_list.pop(len(unified_card_list) - 1 - i)  # Remove the card from its position
-                        unified_card_list.append(
-                            (card_name, card_info))  # Place it at the end so it draws last (on top)
-                        break
 
+                    tableau_index = card_info.get("tableau")
+                    if rect.collidepoint(event.pos) and card_info.get("face_up") and tableau_index is not None:
+                        clicked_card_index = tableau_piles[tableau_index].index(card_name)
+
+                        # Check if all cards below the clicked card form a valid stack
+                        valid_stack = True
+                        cards_to_move = [card_name]  # Start with the clicked card
+                        for j in range(clicked_card_index, len(tableau_piles[tableau_index]) - 1):
+                            card1 = tableau_piles[tableau_index][j]
+                            card2 = tableau_piles[tableau_index][j + 1]
+
+                            if not is_valid_move(card1, card2):
+                                valid_stack = False
+                                break
+                            cards_to_move.append(card2)  # Add the next card in the stack
+
+                        # If it's a valid stack or the top card, allow dragging
+                        if valid_stack:
+                            dragging = True
+                            dragged_cards = cards_to_move  # Store all cards in the stack to be moved
+                            offset_x = rect.x - event.pos[0]
+                            offset_y = rect.y - event.pos[1]
+                            # Move the entire stack to the front of the unified card list
+                            for card in cards_to_move:
+                                unified_card_list.pop(unified_card_list.index((card, card_rectangles[card])))
+                                unified_card_list.append(
+                                    (card, card_rectangles[card]))  # Ensure all cards in the stack are drawn on top
+                            break
             elif event.type == pygame.MOUSEBUTTONUP:
-                if dragging and dragged_card:
-                    # After releasing the card, stop dragging.
+                if dragging and dragged_cards:
                     dragging = False
-                    # Check if the dragged card came from a tableau pile
-                    tableau_index = card_rectangles[dragged_card].get("tableau")
-                    if tableau_index is not None:
-                        # Ensure the card is in the tableau pile before removing
-                        if dragged_card in tableau_piles[tableau_index]:
-                            # Remove the moved card from the tableau pile
-                            tableau_piles[tableau_index].remove(dragged_card)
-                        # Check if the tableau pile still has cards after the move
-                        if tableau_piles[tableau_index]:
-                            # Get the new top card in the tableau pile (after the move)
-                            top_card = tableau_piles[tableau_index][-1]
-                            # If the top card is face-down, reveal it and make it movable
+                    valid_drop = False
+
+                    # Try to place the cards on one of the tableau piles
+                    tableau_index = card_rectangles[dragged_cards[0]].get("tableau")
+                    original_tableau_index = tableau_index  # Track the original tableau pile the cards came from
+
+                    for new_tableau_index in range(7):  # Check if the cards are dropped on any tableau pile
+                        tableau_rect = pygame.Rect(50 + new_tableau_index * 110,
+                                                   175 + len(tableau_piles[new_tableau_index]) * 30, 71, 96)
+
+                        if tableau_rect.collidepoint(event.pos):
+                            # Check if the move is valid according to the rules
+                            if len(tableau_piles[new_tableau_index]) == 0:  # Empty tableau pile accepts only King
+                                if dragged_cards[0].startswith('king'):
+                                    for card in dragged_cards:
+                                        tableau_piles[new_tableau_index].append(card)
+                                        card_rectangles[card]["tableau"] = new_tableau_index
+                                    valid_drop = True
+                            else:
+                                top_card = tableau_piles[new_tableau_index][-1]
+                                if is_valid_move(top_card, dragged_cards[0]):
+                                    for card in dragged_cards:
+                                        tableau_piles[new_tableau_index].append(card)
+                                        card_rectangles[card]["tableau"] = new_tableau_index
+                                    valid_drop = True
+
+                    # If the move is valid and the cards were moved to a different pile
+                    if valid_drop and original_tableau_index != new_tableau_index:
+                        # Remove the dragged cards from the original tableau pile
+                        for card in dragged_cards:
+                            tableau_piles[original_tableau_index].remove(card)
+
+                        # Flip the next card in the original pile, if there is one
+                        if tableau_piles[original_tableau_index]:
+                            top_card = tableau_piles[original_tableau_index][-1]
                             if not card_rectangles[top_card]["face_up"]:
                                 card_rectangles[top_card]["face_up"] = True
                                 card_rectangles[top_card]["movable"] = True
 
-                    dragged_card = None
+                    # If the move is invalid, return the cards to their original position
+                    if not valid_drop:
+                        for index, card in enumerate(dragged_cards):
+                            original_position = (
+                            50 + original_tableau_index * 110, 175 + (clicked_card_index + index) * 30)
+                            card_rectangles[card]["rect"].topleft = original_position
+
+                    # Reset dragged_cards variable
+                    dragged_cards = None
 
 
             elif event.type == pygame.MOUSEMOTION:
-                if dragging and dragged_card:
-                    # Move the card with the mouse
-                    for card_name, card_info in unified_card_list:
-                        if card_name == dragged_card:
-                            card_info["rect"].x = event.pos[0] + offset_x
-                            card_info["rect"].y = event.pos[1] + offset_y
-
-        # Check if the top card of any tableau pile has been moved by coordinates
-        for tableau_index, tableau_cards in enumerate(tableau_piles):
-            if tableau_cards:  # Only check non-empty piles
-                top_card = tableau_cards[-1]
-                # Check if the top card has moved outside its original pile area
-                card_rect = card_rectangles[top_card]["rect"]
-                original_position = (50 + tableau_index * 110, 175 + (len(tableau_cards) - 1) * 30)
-
-                # If the card's position has changed
-                if (card_rect.x, card_rect.y) != original_position:
-                    # Make the next card face-up and movable if there's another card in the pile
-                    if len(tableau_cards) > 1:
-                        next_card = tableau_cards[-2]
-                        card_rectangles[next_card]["face_up"] = True
-                        card_rectangles[next_card]["movable"] = True
+                if dragging and dragged_cards:
+                    # Move all the dragged cards together
+                    for index, card_name in enumerate(dragged_cards):
+                        card_info = card_rectangles[card_name]
+                        card_info["rect"].x = event.pos[0] + offset_x
+                        card_info["rect"].y = event.pos[1] + offset_y + (index * 30)  # Maintain stack spacing while dragging
 
         screen.fill(dark_green)
 
