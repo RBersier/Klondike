@@ -4,7 +4,7 @@ Module : Projet Dev
 Author : Ryan BERSIER & Alexis LEAKOS
 Start date: 03.09.24
 Latest update: 08.10.24
-Version : 0.2
+Version : 0.3
 
 Description:    this file contains the code for
                 the window with the highscores board of the game.
