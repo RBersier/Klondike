@@ -73,16 +73,16 @@ def get_top_scores(conn):
         return []
 
 # ...to insert a new student in the students' data
-def add_player(pseudo):
-    query = "INSERT INT players (name) VALUES (%s)"
-    cursor = db_connection.cursor()
+def add_player(conn, pseudo):
+    query = "Insert into players (name) VALUES (%s)"
+    cursor = conn.cursor()
     cursor.execute(query, (pseudo,))
     cursor.close()
 
 # ...to get a student id by his pseudo
-def get_player_id_by_name(pseudo):
+def get_player_id_by_name(conn, pseudo):
     query = "SELECT id FROM players WHERE name = %s"
-    cursor = db_connection.cursor()
+    cursor = conn.cursor()
     cursor.execute(query, (pseudo,))
     result_id = cursor.fetchall()
     cursor.close()

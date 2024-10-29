@@ -12,29 +12,90 @@ Description:    this file contains the code for
 
 import tkinter as tk
 
+import Database
+import ScoresWin
+
+
 def save_game_score():
-    def get_username():
-        username_window = tk.Toplevel(root)
-        username_label = tk.Label(username_window, text="Enter your username:")
-        username_entry = tk.Entry(username_window)
-        username_button = tk.Button(username_window, text="Confirm", command=lambda: print(f"Nice to see you, {username_entry.get()} !"))
+    return
 
-        username_label.pack()
-        username_entry.pack()
-        username_button.pack()
+def get_username():
+    username_window = tk.Toplevel(root)
+    height = 100
+    width = 200
+    username_window.geometry(f"{width}x{height}")
+    conn = Database.db_connection("127.0.0.1", "root", "Pa$$w0rd", "Solitaire")
+    username_label = tk.Label(username_window, text="Enter your username:")
+    username_entry = tk.Entry(username_window)
+    username_button = tk.Button(username_window, text="Confirm", command=lambda: confirm_player(conn, username_entry.get(), username_window))
 
-    root = tk.Tk()
-    root.title("Login or Register")
+    username_label.pack()
+    username_entry.pack()
+    username_button.pack()
 
-    question_label = tk.Label(root, text="Have you already played before?")
-    yes_button = tk.Button(root, text="Yes", command=get_username)
-    no_button = tk.Button(root, text="No", command=get_username)
+def new_username():
+    new_username_window = tk.Toplevel(root)
+    height = 100
+    width = 200
+    new_username_window.geometry(f"{width}x{height}")
+    conn = Database.db_connection("127.0.0.1", "root", "Pa$$w0rd", "Solitaire")
+    username_label = tk.Label(new_username_window, text="Enter your username:")
+    username_entry = tk.Entry(new_username_window)
+    username_button = tk.Button(new_username_window, text="Confirm", command=lambda: enter_new_player(conn, username_entry.get(), new_username_window))
 
-    question_label.pack()
-    yes_button.pack()
-    no_button.pack()
+    username_label.pack()
+    username_entry.pack()
+    username_button.pack()
 
-    root.mainloop()
+def info(parent, message, title):
+    info_window = tk.Toplevel(parent)
+    info_window.title(title)
+    height = 100
+    width = 250
+    info_window.geometry(f"{width}x{height}")
+    message_label = tk.Label(info_window, text=message)
+    ok_button = tk.Button(info_window, text="Ok", command=info_window.destroy)
+
+    message_label.pack()
+    ok_button.pack()
+
+def confirm_player(conn, name, topWin):
+    res = Database.get_player_id_by_name(conn, name)
+    try:
+        id = res[0][0]
+    except:
+        info(topWin, "player not found", "IMPORTANT!!!")
+        return False
+
+    topWin.destroy()
+    root.destroy()
+    ScoresWin.score_window()
+
+def enter_new_player(conn, name, topWin):
+    res = Database.get_player_id_by_name(conn, name)
+    try:
+        id = res[0][0]
+        info(topWin, "player already existing", "IMPORTANT!!!")
+        return False
+    except:
+        Database.add_player(conn, name)
+
+    topWin.destroy()
+    root.destroy()
+    ScoresWin.score_window()
+
+root = tk.Tk()
+root.title("Login or Register")
+
+question_label = tk.Label(root, text="Have you already played before?")
+yes_button = tk.Button(root, text="Yes", command=get_username)
+no_button = tk.Button(root, text="No", command=new_username)
+
+question_label.pack()
+yes_button.pack()
+no_button.pack()
+
+root.mainloop()
 
 if __name__ == "__main__":
     save_game_score()
