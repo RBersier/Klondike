@@ -63,6 +63,11 @@ def confirm_player(conn, name, topWin):
     res = Database.get_player_id_by_name(conn, name)
     try:
         id = res[0][0]
+        Database.db_connection("127.0.0.1", "root", "Pa$$w0rd", "Solitaire")
+        """
+        Add the function to add scores with the username.
+        """
+        Database.close_connection(conn)
     except:
         info(topWin, "player not found", "IMPORTANT!!!")
         return False
@@ -78,7 +83,13 @@ def enter_new_player(conn, name, topWin):
         info(topWin, "player already existing", "IMPORTANT!!!")
         return False
     except:
+        Database.db_connection("127.0.0.1", "root", "Pa$$w0rd", "Solitaire")
         Database.add_player(conn, name)
+        print(name)
+        """
+        Add the function to add scores with the username.
+        """
+        Database.close_connection(conn)
 
     topWin.destroy()
     root.destroy()
